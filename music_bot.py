@@ -1,21 +1,15 @@
+import os
 import discord
 from discord.ext import commands
 import yt_dlp
-import asyncio
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-ytdlp_opts = {
-    'format': 'bestaudio/best',
-    'quiet': True,
-}
-
-ffmpeg_opts = {
-    'options': '-vn'
-}
+ytdlp_opts = {'format': 'bestaudio/best', 'quiet': True}
+ffmpeg_opts = {'options': '-vn'}
 
 @bot.event
 async def on_ready():
@@ -27,10 +21,14 @@ async def join(ctx):
         await ctx.author.voice.channel.connect()
         await ctx.send("🎧 Joined voice channel")
     else:
-        await ctx.send("❌ You must join a voice channel first")
+        await ctx.send("❌ Join a voice channel first")
 
-@bot.command()
+@bot.command(aliases=["p"])
 async def play(ctx, *, url):
+    if not ctx.author.voice:
+        await ctx.send("❌ Join a voice channel first")
+        return
+
     if not ctx.voice_client:
         await ctx.author.voice.channel.connect()
 
@@ -46,27 +44,10 @@ async def play(ctx, *, url):
     await ctx.send(f"▶️ Now playing: **{title}**")
 
 @bot.command()
-async def pause(ctx):
-    if ctx.voice_client.is_playing():
-        ctx.voice_client.pause()
-        await ctx.send("⏸ Paused")
-
-@bot.command()
-async def resume(ctx):
-    if ctx.voice_client.is_paused():
-        ctx.voice_client.resume()
-        await ctx.send("▶️ Resumed")
-
-@bot.command()
-async def stop(ctx):
-    if ctx.voice_client:
-        ctx.voice_client.stop()
-        await ctx.send("⏹ Stopped")
-
-@bot.command()
 async def leave(ctx):
     if ctx.voice_client:
         await ctx.voice_client.disconnect()
-        await ctx.send("👋 Left voice channel")
 
-bot.run("MTQ1Mzk1MjU1MjQ5NTIxODgwMA.G3611k.iqfUqq21UgGE2rJOfOvOv_9TpcIdLgUY_Cpt_U")
+# ✅ SAFE
+bot.run(os.getenv("MTQ1Mzk1MjU1MjQ5NTIxODgwMA.G3611k.iqfUqq21UgGE2rJOfOvOv_9TpcIdLgUY_Cpt_U"))
+
